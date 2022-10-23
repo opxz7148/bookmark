@@ -25,3 +25,29 @@ CREATE TABLE history (
     FOREIGN KEY (userid)
         REFERENCES users(id)
 );
+
+CREATE TABLE genre (
+	id INTEGER PRIMARY KEY,
+	genre TEXT NOT NULL
+)
+
+INSERT INTO bookusers (username,hash)
+VALUES (
+	"opxz7148",
+	"pbkdf2:sha256:260000$WNjsfzYiOqnbRkiQ$cb46202f69ed582c461d4b332a8dcc245ac326e741ae3d455b78dbdb38ba769d"
+)
+
+INSERT INTO genre (genre) VALUES
+(
+	"Science Fiction"
+)
+
+INSERT INTO genre (genre) VALUES
+(
+	"Drama"
+);
+
+CREATE TABLE user_genre (
+	userid INTEGER,
+	genreid INTEGER
+)

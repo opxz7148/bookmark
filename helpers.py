@@ -6,6 +6,8 @@ import urllib.parse
 from flask import redirect, render_template, request, session
 from functools import wraps
 
+# Insert google api here
+api_key = "AIzaSyBgtSB8VJxzH1tpeFoN30zAgy7bm9NCMFM" 
 
 def apology(message, code=400):
     """Render message as an apology to user."""
@@ -41,7 +43,6 @@ def searchbook(name):
 
     # Contact with google book API
     try:
-        api_key = os.environ.get("API_KEY")
         url = f"https://www.googleapis.com/books/v1/volumes?q={name}&maxResults=10&key={api_key}"
         response = requests.get(url)
         response.raise_for_status()
@@ -77,7 +78,6 @@ def getbookinfo(id, size):
 
     try:
         # Contact with api to get certain book information by ID
-        api_key = os.environ.get("API_KEY")
         url = f"https://www.googleapis.com/books/v1/volumes/{id}?key={api_key}"
         response = requests.get(url)
         response.raise_for_status()

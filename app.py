@@ -2,8 +2,11 @@
 # pk_e4c2af32792443c9bbab8925cb105d41
 
 from ast import keyword
+from lib2to3.pytree import generate_matches
+from operator import ge
 import os
 import re
+from tkinter import INSERT
 
 from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session
@@ -27,11 +30,6 @@ Session(app)
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///finance.db")
 
-# Make sure API key is set
-if not os.environ.get("API_KEY"):
-    raise RuntimeError("API_KEY not set")
-
-
 @app.after_request
 def after_request(response):
     """Ensure responses aren't cached"""
@@ -45,7 +43,7 @@ def after_request(response):
 @login_required
 def index():
     """Show portfolio of stocks"""
-    user = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
+    user = db.execute("SELECT * FROM bookusers WHERE id = ?", session["user_id"])
 
 
     return render_template("index.html", username=user[0]["username"])
@@ -70,7 +68,7 @@ def login():
             return apology("must provide password", 403)
 
         # Query database for username
-        rows = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username"))
+        rows = db.execute("SELECT * FROM bookusers WHERE username = ?", request.form.get("username"))
 
         # Ensure username exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
@@ -132,25 +130,34 @@ def register():
 
         hash_pass = generate_password_hash(password)
 
+        # Get user favourite genre as list
+        genres = request.form.getlist("genre")
+        
         try:
-            db.execute("INSERT INTO users (username, hash) VALUES (?,?)", username, hash_pass)
+            db.execute("INSERT INTO bookusers (username, hash) VALUES (?,?)", username, hash_pass)
         except ValueError:
             return apology("Username has been used")
 
+        user_id = (db.execute("SELECT id FROM bookusers WHERE username = ?", username))[0]["id"]
+        
+        for genre in genres:
+            genre_id = (db.execute("SELECT id FROM genre WHERE genre = ?", genre))[0]["id"]
+            db.execute("INSERT INTO user_genre (userid, genreid) VALUES (?,?)", user_id, genre_id)
         return redirect("/login")
 
     # User call register page
     else:
-        return render_template("register.html")
+        genres = db.execute("SELECT * FROM genre")
+        app.logger.info(genres)
+        return render_template("register.html", genres=genres)
 
 
 @app.route("/search", methods=["GET", "POST"])
-@login_required
 def search():
     
     # If recieve POST request 
     if request.method == "POST":
-
+    
         # Get seacrh keyword
         keyword = request.form.get("booksearch")
         # Search key by ID
@@ -166,10 +173,11 @@ def search():
         # Render template with book result and keyword
         return render_template("searchre.html", book_re=book_re, keyword=keyword)
     else:
+        test = db.execute("SELECT * FROM bookusers WHERE id = 10")
+        app.logger.info(test)
         return render_template("searchbook.html")
 
 @app.route("/moreinfo", methods=["POST"])
-@login_required
 def moreinfo():
 
     # If recieve POST request 

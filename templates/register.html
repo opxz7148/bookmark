@@ -5,7 +5,8 @@
 {% endblock %}
 
 {% block main %}
-    <form action="/register" method="post">
+    <form action="/register" method="post" class="w-100">
+        <h1>Register</h1>
         <div class="mb-3">
             <input required autocomplete="off" autofocus class="form-control mx-auto w-auto" id="username" name="username" placeholder="Username" type="text">
         </div>
@@ -15,6 +16,15 @@
         <div class="mb-3">
             <input required class="form-control mx-auto w-auto" id="password_confirm" name="confirmation" placeholder="Password Confirm" type="password">
         </div>
-        <button class="btn btn-primary" type="submit">Register</button>
+        <h5 class="m-4">Select your favourite book genre</h5>
+        <div class="mw-50 d-flex flex-row flex-wrap genre">
+            {% for genre in genres %}
+            <div class="d-flex flex-row" >
+                <input class="m-2" type="checkbox" name="genre" value="{{ genre['genre'] }}" id="{{ genre['genre'] }}">
+                <label class="me-2" for="{{ genre['genre'] }}">{{ genre['genre'] }}</label>
+            </div>
+            {% endfor %}
+        </div>
+        <button class="btn btn-primary mt-3" type="submit">Register</button>
     </form>
 {% endblock %}
