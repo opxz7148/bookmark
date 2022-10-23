@@ -37,5 +37,20 @@
         {{ book["des"] }}
         </p>
     </div>
+    <h4>Page count : {{ book["pgcount"] }}</h4>
+    <h4>Publisher : {{ book["publisher"] }}</h4>
+    <h4>Average Rating : {{ book["avgrate"] }} <i class="bi bi-star"></i></h4>
+    <form action="/collection">
+        <input type="hidden" value="{{ book['id'] }}" name="id">
+        <input type="hidden" value="{{ book['thumb'] }}" name="imglink">
+        <input type="hidden" value="{{ book['authors'] }}" name="imglink">
+        <input type="submit" class="mb-2 btn btn-primary" value="Add to collection">
+    </form>
+        <form action="/wish">
+        <input type="hidden" value="{{ book['id'] }}" name="id">
+        <input type="hidden" value="{{ book['thumb'] }}" name="imglink">
+        <input type="hidden" value="{{ book['authors'] }}" name="imglink">
+        <input type="submit" class="mb-2 btn btn-primary" value="Add to wishlist">
+    </form>
 
 {% endblock %}

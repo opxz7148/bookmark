@@ -190,3 +190,20 @@ def moreinfo():
         # Render more info page with book information
         return render_template("moreinfo.html", book=book)
 
+@app.route("/profile")
+def profile():
+    username = (db.execute("SELECT username FROM bookusers WHERE id = ?", session["user_id"]))[0]["username"]
+    usergenre = db.execute(
+    """
+    SELECT genre 
+    FROM genre
+    WHERE id IN
+    (
+        SELECT genreid 
+        FROM user_genre
+        WHERE userid = ?
+    )
+    """
+    , session["user_id"])
+
+    return render_template("profile.html", username=username, usergenre=usergenre)

@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Profile
+{% endblock %}
+
+{% block main %}
+    <div class="p-5">
+        <h1>{{ username }}!</h1>
+        <h2>Favourite Genre:</h2>
+        <h5>
+            {% for genre in usergenre %}
+                {{ genre["genre"] ~ ","}}
+            {% endfor %}
+        </h5>
+    </table>
+{% endblock %}
