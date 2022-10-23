@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Search results: {{ keyword }}
+{% endblock %}
+
+{% block main %}
+    <h3>Keyword: {{ keyword }}</h3>
+    <h3>result:</h3>
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Cover</th>
+                <th>Title</th>
+                <th>Author</th>
+            </tr>
+        </thead>
+        
+        <tbody>
+            {% for book in book_re %}
+                {% if book != None %}
+                
+                <tr>          
+                        <td><img src="{{ book['smallthumb'] }}" alt=""></td>
+                        <td><h5>{{ book["title"] }}</h5></td>
+                        <td>{{ book["authors"] }}</td>
+                        <form method="POST" action="/moreinfo">
+                            <input type="hidden" value="{{ book['id'] }}" name="id">
+                            <td><input type="submit" value="More Info"></td>
+                        </form>
+                </tr>
+                
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+<!-- # http://books.google.com/books/content?id=p1MULH7JsTQC&printsec=frontcover&img=1&zoom=2&edge=curl&imgtk=AFLRE73EGnICCNBtkCAgFPjH5VcdLDbzxDPUmWmkR9VRU9KllKevAP3I_CjKCQf8-tfPyxbaFkTGsuaVWP5v3HcVTkceocqCShVhWAXM0KsoEQPHHhly25NTR34AfgfW2kKsgWOTqg2E&source=gbs_api
+# http://books.google.com/books/content?id=p1MULH7JsTQC&printsec=frontcover&img=1&zoom=2&edge=curl&imgtk=AFLRE73EGnICCNBtkCAgFPjH5VcdLDbzxDPUmWmkR9VRU9KllKevAP3I_CjKCQf8-tfPyxbaFkTGsuaVWP5v3HcVTkceocqCShVhWAXM0KsoEQPHHhly25NTR34AfgfW2kKsgWOTqg2E&source=gbs_api -->
