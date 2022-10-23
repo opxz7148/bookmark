@@ -11,7 +11,7 @@ from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology, getbookinfo, login_required, lookup, searchbook, usd
+from helpers import apology, getbookinfo, login_required, searchbook, usd
 
 # Configure application
 app = Flask(__name__)
@@ -51,7 +51,7 @@ def index():
     user = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
 
 
-    return render_template("index.html", username=user[0]["username"], cash=usd(user[0]["cash"]), lookup=lookup, usd=usd)
+    return render_template("index.html", username=user[0]["username"], cash=usd(user[0]["cash"]), usd=usd)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -168,10 +168,7 @@ def search():
 def moreinfo():
     if request.method == "POST":
         id = request.form.get("id")
-        book = getbookinfo(id)
-        app.logger.info(book['smallthumb'])
-        app.logger.info(book['smallpic'])
-        app.logger.info(book['mediumpic'])
-        app.logger.info(book['largepic'])
+        book = getbookinfo(id, "f")
+        app.logger.info(book)
         return render_template("moreinfo.html", book=book)
 

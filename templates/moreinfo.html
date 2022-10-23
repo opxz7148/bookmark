@@ -5,5 +5,37 @@
 {% endblock %}
 
 {% block main %}
-    <img src="{{ book['smallpic'] }}" alt="">
+
+        <div>
+            <img src="{{ book['thumb'] }}" alt="">
+        </div>
+        <div>
+            <h1 class="mt-4">{{ book['title'] }}</h1>
+            <h2>
+                Author:
+            </h2>
+            <h4>
+                    {% for author in book["authors"] %}
+                    {{ author }}
+                <br>
+                {% endfor %}
+            </h4>
+            <h2>
+                Categories:
+            </h2    >
+            <h4>
+                {% for cat in book["cat"] %}
+                    {{ cat }}
+                    <br>
+                {% endfor %}
+            </h4>
+        </div>
+
+    <h2>Description:</h2>
+    <div>
+        <p class="pe-5 ps-5">
+        {{ book["des"] }}
+        </p>
+    </div>
+
 {% endblock %}

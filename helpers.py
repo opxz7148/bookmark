@@ -1,3 +1,4 @@
+from curses.ascii import isalpha, islower, isupper
 import os
 import requests
 import urllib.parse
@@ -35,29 +36,6 @@ def login_required(f):
     return decorated_function
 
 
-def lookup(symbol):
-    """Look up quote for symbol."""
-
-    # Contact API
-    try:
-        api_key = os.environ.get("API_KEY")
-        url = f"https://cloud.iexapis.com/stable/stock/{urllib.parse.quote_plus(symbol)}/quote?token={api_key}"
-        response = requests.get(url)
-        response.raise_for_status()
-    except requests.RequestException:
-        return None
-
-    # Parse response
-    try:
-        quote = response.json()
-        return {
-            "name": quote["companyName"],
-            "price": float(quote["latestPrice"]),
-            "symbol": quote["symbol"]
-        }
-    except (KeyError, TypeError, ValueError):
-        return None
-
 def searchbook(name):
     """Look up quote for symbol."""
 
@@ -85,7 +63,7 @@ def searchbook(name):
         bookinfo = []
 
         for id in id_list:
-            eachbookinfo = getbookinfo(id)
+            eachbookinfo = getbookinfo(id, "s")
             bookinfo.append(eachbookinfo)
     
         return bookinfo
@@ -93,7 +71,7 @@ def searchbook(name):
         return None
 
 # Have book id as a argument return dict with each book information
-def getbookinfo(id):
+def getbookinfo(id, size):
 
     bookinfo = {}
 
@@ -106,36 +84,69 @@ def getbookinfo(id):
         return None
 
     # Parse response
-    try:
-        bookRe = response.json()
-        volumeInfo = bookRe["volumeInfo"]
-        bookinfo = {}
-         # store nescessary info into bookinfo dict
+    
+    # try:
+    bookRe = response.json()
+    volumeInfo = bookRe["volumeInfo"]
+    bookinfo = {}
+        # store nescessary info into bookinfo dict
+    if size == "s":
         bookinfo = {
             "id": id,
             "title": volumeInfo["title"],
-            "des": volumeInfo["description"],
-            "smallpic": volumeInfo["imageLinks"]["small"],
-            "mediumpic": volumeInfo["imageLinks"]["medium"],
-            "largepic": volumeInfo["imageLinks"]["large"],
-            "moreinfo": volumeInfo["infoLink"],
-            "smallthumb": volumeInfo["imageLinks"]["smallThumbnail"]
+            # "des": volumeInfo["description"],
+            "smallthumb": volumeInfo["imageLinks"]["smallThumbnail"],
+            # "thumb": volumeInfo["imageLinks"]["thumbnail"],
+            # "smallpic": volumeInfo["imageLinks"]["small"],
+            # "mediumpic": volumeInfo["imageLinks"]["medium"],
+            # "largepic": volumeInfo["imageLinks"]["large"],
+            # "moreinfo": volumeInfo["infoLink"],
+            "authors": volumeInfo["authors"],
+            # "cat": volumeInfo["mainCategory"]
+        }
+    elif size == "f":
+        bookinfo = {
+            "id": id,
+            "title": volumeInfo["title"],
+            "smallthumb": volumeInfo["imageLinks"]["smallThumbnail"],
+            "thumb": volumeInfo["imageLinks"]["thumbnail"],
+            # "smallpic": volumeInfo["imageLinks"]["small"],
+            # "mediumpic": volumeInfo["imageLinks"]["medium"],
+            # "largepic": volumeInfo["imageLinks"]["large"],
+            # "moreinfo": volumeInfo["infoLink"],
+            "authors": volumeInfo["authors"],
+            "cat": volumeInfo["categories"],
+            "avgrate": volumeInfo["averageRating"],
+            "pgcount": volumeInfo["pageCount"],
+            "publisher": volumeInfo["publisher"]            
         }
 
-        # If there only one author directly add into dict 
-        if len(volumeInfo["authors"]) < 2:
-            bookinfo["authors"] = volumeInfo["authors"][0]
-        # If there more then one author combine each into string and add into dict
-        else:
-            authors = ""
-            for author in volumeInfo["authors"]:
-                authors += ", " + author   
-            bookinfo["authors"] = authors
-
-        return bookinfo
+    re = ""
+    remove = 1
+    des = volumeInfo["description"]
+    for c in range(len(des) - 1):
         
-    except (KeyError, TypeError, ValueError):
-        return None
+        if des[c] == "<" and remove == 1:
+            remove *= -1
+    
+        if remove == 1:
+            re += des[c]
+
+        if des[c] == ">" and remove == -1:
+            remove *= -1
+        
+        try:
+            if des[c] == ">" and isalpha(des[c + 1]):
+                re += " "
+        except IndexError:
+            pass
+
+    bookinfo["des"] = re
+        
+    return bookinfo
+        
+    # except (KeyError, TypeError, ValueError):
+    #     return None
 
 
 

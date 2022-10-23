@@ -23,7 +23,12 @@
                 <tr>          
                         <td><img src="{{ book['smallthumb'] }}" alt=""></td>
                         <td><h5>{{ book["title"] }}</h5></td>
-                        <td>{{ book["authors"] }}</td>
+                        <td>
+                            {% for author in book["authors"] %}
+                            {{ author }}
+                            <br>
+                            {% endfor %}
+                        </td>
                         <form method="POST" action="/moreinfo">
                             <input type="hidden" value="{{ book['id'] }}" name="id">
                             <td><input type="submit" value="More Info"></td>
