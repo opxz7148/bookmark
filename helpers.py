@@ -76,6 +76,7 @@ def getbookinfo(id, size):
     bookinfo = {}
 
     try:
+        # Contact with api to get certain book information by ID
         api_key = os.environ.get("API_KEY")
         url = f"https://www.googleapis.com/books/v1/volumes/{id}?key={api_key}"
         response = requests.get(url)
@@ -85,77 +86,69 @@ def getbookinfo(id, size):
 
     # Parse response
     
-    # try:
-    bookRe = response.json()
-    volumeInfo = bookRe["volumeInfo"]
-    bookinfo = {}
+    try:
+        bookRe = response.json()
+        volumeInfo = bookRe["volumeInfo"]
+        bookinfo = {}
         # store nescessary info into bookinfo dict
-    if size == "s":
-        bookinfo = {
-            "id": id,
-            "title": volumeInfo["title"],
-            # "des": volumeInfo["description"],
-            "smallthumb": volumeInfo["imageLinks"]["smallThumbnail"],
-            # "thumb": volumeInfo["imageLinks"]["thumbnail"],
-            # "smallpic": volumeInfo["imageLinks"]["small"],
-            # "mediumpic": volumeInfo["imageLinks"]["medium"],
-            # "largepic": volumeInfo["imageLinks"]["large"],
-            # "moreinfo": volumeInfo["infoLink"],
-            "authors": volumeInfo["authors"],
-            # "cat": volumeInfo["mainCategory"]
-        }
-    elif size == "f":
-        bookinfo = {
-            "id": id,
-            "title": volumeInfo["title"],
-            "smallthumb": volumeInfo["imageLinks"]["smallThumbnail"],
-            "thumb": volumeInfo["imageLinks"]["thumbnail"],
-            # "smallpic": volumeInfo["imageLinks"]["small"],
-            # "mediumpic": volumeInfo["imageLinks"]["medium"],
-            # "largepic": volumeInfo["imageLinks"]["large"],
-            # "moreinfo": volumeInfo["infoLink"],
-            "authors": volumeInfo["authors"],
-            "cat": volumeInfo["categories"],
-            "avgrate": volumeInfo["averageRating"],
-            "pgcount": volumeInfo["pageCount"],
-            "publisher": volumeInfo["publisher"]            
-        }
+        if size == "s":
+            bookinfo = {
+                "id": id,
+                "title": volumeInfo["title"],
+                # "des": volumeInfo["description"],
+                "smallthumb": volumeInfo["imageLinks"]["smallThumbnail"],
+                # "thumb": volumeInfo["imageLinks"]["thumbnail"],
+                # "smallpic": volumeInfo["imageLinks"]["small"],
+                # "mediumpic": volumeInfo["imageLinks"]["medium"],
+                # "largepic": volumeInfo["imageLinks"]["large"],
+                # "moreinfo": volumeInfo["infoLink"],
+                "authors": volumeInfo["authors"],
+                # "cat": volumeInfo["mainCategory"]
+            }
+        # store full info into bookinfo dict
+        elif size == "f":
+            bookinfo = {
+                "id": id,
+                "title": volumeInfo["title"],
+                "smallthumb": volumeInfo["imageLinks"]["smallThumbnail"],
+                "thumb": volumeInfo["imageLinks"]["thumbnail"],
+                # "smallpic": volumeInfo["imageLinks"]["small"],
+                # "mediumpic": volumeInfo["imageLinks"]["medium"],
+                # "largepic": volumeInfo["imageLinks"]["large"],
+                # "moreinfo": volumeInfo["infoLink"],
+                "authors": volumeInfo["authors"],
+                "cat": volumeInfo["categories"],
+                "avgrate": volumeInfo["averageRating"],
+                "pgcount": volumeInfo["pageCount"],
+                "publisher": volumeInfo["publisher"]            
+            }
 
-    re = ""
-    remove = 1
-    des = volumeInfo["description"]
-    for c in range(len(des) - 1):
+        # Clear unuse html tag indescription
+        re = ""
+        remove = 1
+        des = volumeInfo["description"]
+        for c in range(len(des) - 1):
+            
+            if des[c] == "<" and remove == 1:
+                remove *= -1
         
-        if des[c] == "<" and remove == 1:
-            remove *= -1
-    
-        if remove == 1:
-            re += des[c]
+            if remove == 1:
+                re += des[c]
 
-        if des[c] == ">" and remove == -1:
-            remove *= -1
+            if des[c] == ">" and remove == -1:
+                remove *= -1
+            
+            try:
+                if des[c] == ">" and isalpha(des[c + 1]):
+                    re += " "
+            except IndexError:
+                pass
+
+        bookinfo["des"] = re
+            
+        return bookinfo
         
-        try:
-            if des[c] == ">" and isalpha(des[c + 1]):
-                re += " "
-        except IndexError:
-            pass
-
-    bookinfo["des"] = re
-        
-    return bookinfo
-        
-    # except (KeyError, TypeError, ValueError):
-    #     return None
+    except (KeyError, TypeError, ValueError):
+         return None
 
 
-
-def usd(value):
-    """Format value as USD."""
-    return f"${value:,.2f}"
-
-# def getimglink(bookinfo, size=0):
-#     if size == 0:
-#         return bookinfo["smallpic"]
-#     else:
-#         return bookinfo["medium"]

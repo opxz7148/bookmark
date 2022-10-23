@@ -11,16 +11,13 @@ from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology, getbookinfo, login_required, searchbook, usd
+from helpers import apology, getbookinfo, login_required, searchbook
 
 # Configure application
 app = Flask(__name__)
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
-
-# Custom filter
-app.jinja_env.filters["usd"] = usd
 
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_PERMANENT"] = False
@@ -51,7 +48,7 @@ def index():
     user = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
 
 
-    return render_template("index.html", username=user[0]["username"], cash=usd(user[0]["cash"]), usd=usd)
+    return render_template("index.html", username=user[0]["username"])
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -150,15 +147,23 @@ def register():
 @app.route("/search", methods=["GET", "POST"])
 @login_required
 def search():
+    
+    # If recieve POST request 
     if request.method == "POST":
+
+        # Get seacrh keyword
         keyword = request.form.get("booksearch")
+        # Search key by ID
         book_re = searchbook(keyword)
-        app.logger.info(book_re)
 
-        for book in book_re:
-            app.logger.info(book)
-            app.logger.info("")
+        # app.logger.info(book_re)
 
+
+        # for book in book_re:
+        #     app.logger.info(book)
+        #     app.logger.info("")
+
+        # Render template with book result and keyword
         return render_template("searchre.html", book_re=book_re, keyword=keyword)
     else:
         return render_template("searchbook.html")
@@ -166,9 +171,14 @@ def search():
 @app.route("/moreinfo", methods=["POST"])
 @login_required
 def moreinfo():
+
+    # If recieve POST request 
     if request.method == "POST":
+        # Get book id from searh result page
         id = request.form.get("id")
+        # Get full information of certain book
         book = getbookinfo(id, "f")
-        app.logger.info(book)
+        # app.logger.info(book)
+        # Render more info page with book information
         return render_template("moreinfo.html", book=book)
 
