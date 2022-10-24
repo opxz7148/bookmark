@@ -95,63 +95,94 @@ def getbookinfo(id, size):
             bookinfo = {
                 "id": id,
                 "title": volumeInfo["title"],
-                # "des": volumeInfo["description"],
-                "smallthumb": volumeInfo["imageLinks"]["smallThumbnail"],
-                # "thumb": volumeInfo["imageLinks"]["thumbnail"],
-                # "smallpic": volumeInfo["imageLinks"]["small"],
-                # "mediumpic": volumeInfo["imageLinks"]["medium"],
-                # "largepic": volumeInfo["imageLinks"]["large"],
-                # "moreinfo": volumeInfo["infoLink"],
                 "authors": volumeInfo["authors"],
-                # "cat": volumeInfo["mainCategory"]
             }
+            try:
+                bookinfo["smallthumb"] = volumeInfo["imageLinks"]["smallThumbnail"]
+            except KeyError:
+                pass
+
+            try:
+                bookinfo["authors"] = volumeInfo["authors"]
+            except KeyError:
+                pass
+
         # store full info into bookinfo dict
         elif size == "f":
             bookinfo = {
                 "id": id,
                 "title": volumeInfo["title"],
-                "thumb": volumeInfo["imageLinks"]["thumbnail"],
-                # "smallpic": volumeInfo["imageLinks"]["small"],
-                # "mediumpic": volumeInfo["imageLinks"]["medium"],
-                # "largepic": volumeInfo["imageLinks"]["large"],
-                "moreinfo": volumeInfo["infoLink"],
-                "authors": volumeInfo["authors"],
-                "cat": volumeInfo["categories"],
-                # "avgrate": volumeInfo["averageRating"],
-                "pgcount": volumeInfo["pageCount"],
-                "publisher": volumeInfo["publisher"]            
             }
-
-        # Clear unuse html tag indescription
-        re = ""
-        remove = 1
-        des = volumeInfo["description"]
-        for c in range(len(des) - 1):
-            
-            if des[c] == "<" and remove == 1:
-                remove *= -1
-        
-            if remove == 1:
-                re += des[c]
-
-            if des[c] == ">" and remove == -1:
-                remove *= -1
-            
             try:
-                if des[c] == ">" and isalpha(des[c + 1]):
-                    re += " "
-            except IndexError:
+                bookinfo["authors"] = volumeInfo["authors"]
+            except KeyError:
                 pass
 
-        bookinfo["des"] = re
+            try:
+                bookinfo["publisher"] = volumeInfo["publisher"]
+            except KeyError:
+                pass
+
+            try:
+                bookinfo["pgcount"] = volumeInfo["pageCount"]
+            except KeyError:
+                pass
+
+            try:
+                bookinfo["cat"] = volumeInfo["categories"]
+            except KeyError:
+                pass
+
+            try:
+                bookinfo["moreinfo"] = volumeInfo["imageLinks"]["infolink"]
+            except KeyError:
+                pass
+
+            try:
+                bookinfo["smallthumb"] = volumeInfo["imageLinks"]["smallThumbnail"]
+            except KeyError:
+                pass
+
+            try:
+                bookinfo["thumb"] = volumeInfo["imageLinks"]["smallThumbnail"]
+            except KeyError:
+                pass
+            
+
+        # Clear unuse html tag indescription
+        try:
+            re = ""
+            remove = 1
+            des = volumeInfo["description"]
+            for c in range(len(des) - 1):
+                
+                if des[c] == "<" and remove == 1:
+                    remove *= -1
+            
+                if remove == 1:
+                    re += des[c]
+
+                if des[c] == ">" and remove == -1:
+                    remove *= -1
+                
+                try:
+                    if des[c] == ">" and isalpha(des[c + 1]):
+                        re += " "
+                except IndexError:
+                    pass
+
+                bookinfo["des"] = re
+        except KeyError:
+            pass
+
+        
         try:
             bookinfo["avgrate"] = volumeInfo["averageRating"]
         except KeyError:
             pass
-        
+
         return bookinfo
         
     except (KeyError, TypeError, ValueError):
-         return "Key error"
-
+         return None
 

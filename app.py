@@ -5,6 +5,7 @@ from ast import Str, keyword
 from lib2to3.pytree import generate_matches
 from operator import ge, methodcaller
 import os
+from posixpath import split
 import re
 from tkinter import INSERT
 
@@ -163,7 +164,7 @@ def search():
         # Search key by ID
         book_re = searchbook(keyword)
 
-        # app.logger.info(book_re)
+        app.logger.info(book_re)
 
 
         # for book in book_re:
@@ -184,8 +185,11 @@ def moreinfo():
     if request.method == "POST":
         # Get book id from searh result page
         id = request.form.get("id")
+        app.logger.info(id)
+
         # Get full information of certain book
         book = getbookinfo(id, "f")
+        app.logger.info(book)
 
         check_collection = db.execute(
         """
@@ -212,7 +216,10 @@ def moreinfo():
 
 @app.route("/profile")
 def profile():
+    # Get user username
     username = (db.execute("SELECT username FROM bookusers WHERE id = ?", session["user_id"]))[0]["username"]
+
+    # Get user fav genre
     usergenre = db.execute(
     """
     SELECT genre 
@@ -226,7 +233,16 @@ def profile():
     """
     , session["user_id"])
 
-    return render_template("profile.html", username=username, usergenre=usergenre)
+    # Get user book ongoinng collection
+    user_current = get_user_lst("O")
+
+    # Get user wishlist
+    user_wish = get_user_lst("W")
+    
+    for book in user_current:
+        book["authors"] = book["authors"].split(",")
+
+    return render_template("profile.html", username=username, usergenre=usergenre, user_current=user_current, user_wish=user_wish)
 
 @app.route("/collection", methods=["POST"])
 def add_to_collection():
@@ -261,3 +277,61 @@ def add_to_collection():
     
         db.execute("INSERT INTO users_book (userid, bookid, status) VALUES(?,?,?)", userid, booknoid, "O")
     return redirect("/profile")
+
+
+@app.route("/wish", methods=["POST"])
+def add_to_wish():
+    if request.method == "POST":
+        # Get each information from form
+        title = request.form.get("title")
+        imglink = request.form.get("imglink")
+        bookgid = request.form.get("id")
+        authors = request.form.getlist("authors")
+        # Combine all authors to one string
+        seperator = ","
+        authors = seperator.join(authors)
+
+        try:
+            db.execute(
+            """
+                INSERT INTO book
+                (
+                    bookgid,
+                    imglink,
+                    title,
+                    authors
+                )
+                VALUES (?,?,?,?)
+                """
+            ,bookgid, imglink, title, authors)
+        except ValueError:
+            pass
+
+        userid = session["user_id"]
+        booknoid = (db.execute("SELECT booknoid FROM book WHERE bookgid = ?", bookgid))[0]["booknoid"]
+    
+        db.execute("INSERT INTO users_book (userid, bookid, status) VALUES(?,?,?)", userid, booknoid, "W")
+    return redirect("/profile")
+
+def get_user_lst(type):
+
+    if type != "W" and type != "O" and type != "D":
+        return None
+    user_lst = db.execute(
+        """
+        SELECT imglink, title, authors, bookgid, booknoid
+        FROM book
+        WHERE booknoid
+        IN
+        (
+            SELECT bookid
+            FROM users_book
+            WHERE userid = ?
+            AND 
+            status = ?
+        )
+        """
+    ,session["user_id"], type)
+    
+    return user_lst
+    

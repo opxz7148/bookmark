@@ -43,9 +43,9 @@
 
     {% if not incollection %}
     <form action="/collection" method="POST">
-    <input type="hidden" value="{{ book['id'] }}" name="id">
+        <input type="hidden" value="{{ book['id'] }}" name="id">
         <input type="hidden" value="{{ book['title'] }}" name="title">
-        <input type="hidden" value="{{ book['thumb'] }}" name="imglink">
+        <input type="hidden" value="{{ book['smallthumb'] }}" name="imglink">
         {% for author in book["authors"] %}
             <input type="hidden" value="{{ author }}" name="authors">
         {% endfor %}
@@ -54,7 +54,10 @@
         <form action="/wish" method="post">
         <input type="hidden" value="{{ book['id'] }}" name="id">
         <input type="hidden" value="{{ book['title'] }}" name="title">
-        <input type="hidden" value="{{ book['thumb'] }}" name="imglink">
+        <input type="hidden" value="{{ book['smallthumb'] }}" name="imglink">
+        {% for author in book["authors"] %}
+            <input type="hidden" value="{{ author }}" name="authors">
+        {% endfor %}
         <input type="submit" class="mb-2 btn btn-primary" value="Add to wishlist">
     </form>
     {% endif %}
