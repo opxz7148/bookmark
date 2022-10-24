@@ -110,15 +110,14 @@ def getbookinfo(id, size):
             bookinfo = {
                 "id": id,
                 "title": volumeInfo["title"],
-                "smallthumb": volumeInfo["imageLinks"]["smallThumbnail"],
                 "thumb": volumeInfo["imageLinks"]["thumbnail"],
                 # "smallpic": volumeInfo["imageLinks"]["small"],
                 # "mediumpic": volumeInfo["imageLinks"]["medium"],
                 # "largepic": volumeInfo["imageLinks"]["large"],
-                # "moreinfo": volumeInfo["infoLink"],
+                "moreinfo": volumeInfo["infoLink"],
                 "authors": volumeInfo["authors"],
                 "cat": volumeInfo["categories"],
-                "avgrate": volumeInfo["averageRating"],
+                # "avgrate": volumeInfo["averageRating"],
                 "pgcount": volumeInfo["pageCount"],
                 "publisher": volumeInfo["publisher"]            
             }
@@ -145,10 +144,14 @@ def getbookinfo(id, size):
                 pass
 
         bookinfo["des"] = re
-            
+        try:
+            bookinfo["avgrate"] = volumeInfo["averageRating"]
+        except KeyError:
+            pass
+        
         return bookinfo
         
     except (KeyError, TypeError, ValueError):
-         return None
+         return "Key error"
 
 

@@ -51,3 +51,30 @@ CREATE TABLE user_genre (
 	userid INTEGER,
 	genreid INTEGER
 )
+
+CREATE TABLE users_book
+(
+	userid INTEGER NOT NULL,
+	bookid INTEGER NOT NULL,
+	status TEXT NOT NULL,
+	FOREIGN KEY (userid) REFERENCES bookusers(id),
+	FOREIGN KEY (bookid) REFERENCES book(booknoid)
+)
+
+CREATE TABLE book
+(
+	booknoid INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+	bookgid TEXT NOT NULL UNIQUE,
+	imglink TEXT NOT NULL,
+	title TEXT NOT NULL,
+	authors TEXT NOT NULL
+)
+
+CREATE TABLE book
+(
+	booknoid INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+	bookgid TEXT NOT NULL UNIQUE,
+	imglink TEXT NOT NULL,
+	title TEXT NOT NULL,
+	authors TEXT NOT NULL
+)

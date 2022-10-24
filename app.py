@@ -1,9 +1,9 @@
 
 # pk_e4c2af32792443c9bbab8925cb105d41
 
-from ast import keyword
+from ast import Str, keyword
 from lib2to3.pytree import generate_matches
-from operator import ge
+from operator import ge, methodcaller
 import os
 import re
 from tkinter import INSERT
@@ -186,9 +186,29 @@ def moreinfo():
         id = request.form.get("id")
         # Get full information of certain book
         book = getbookinfo(id, "f")
-        # app.logger.info(book)
+
+        check_collection = db.execute(
+        """
+        SELECT bookid 
+        FROM users_book 
+        WHERE userid = ? 
+        AND 
+        bookid = 
+        (
+            SELECT booknoid
+            FROM book
+            WHERE bookgid = ?
+        )
+        """
+        , session["user_id"], id)
+        
+        if check_collection == []:
+            incollection = False
+        else:
+            incollection = True
+
         # Render more info page with book information
-        return render_template("moreinfo.html", book=book)
+        return render_template("moreinfo.html", book=book, incollection=incollection)
 
 @app.route("/profile")
 def profile():
@@ -207,3 +227,37 @@ def profile():
     , session["user_id"])
 
     return render_template("profile.html", username=username, usergenre=usergenre)
+
+@app.route("/collection", methods=["POST"])
+def add_to_collection():
+    if request.method == "POST":
+        # Get each information from form
+        title = request.form.get("title")
+        imglink = request.form.get("imglink")
+        bookgid = request.form.get("id")
+        authors = request.form.getlist("authors")
+        # Combine all authors to one string
+        seperator = ","
+        authors = seperator.join(authors)
+
+        try:
+            db.execute(
+            """
+                INSERT INTO book
+                (
+                    bookgid,
+                    imglink,
+                    title,
+                    authors
+                )
+                VALUES (?,?,?,?)
+                """
+            ,bookgid, imglink, title, authors)
+        except ValueError:
+            pass
+
+        userid = session["user_id"]
+        booknoid = (db.execute("SELECT booknoid FROM book WHERE bookgid = ?", bookgid))[0]["booknoid"]
+    
+        db.execute("INSERT INTO users_book (userid, bookid, status) VALUES(?,?,?)", userid, booknoid, "O")
+    return redirect("/profile")

@@ -15,7 +15,7 @@
                 Author:
             </h2>
             <h4>
-                    {% for author in book["authors"] %}
+                {% for author in book["authors"] %}
                     {{ author }}
                 <br>
                 {% endfor %}
@@ -40,17 +40,24 @@
     <h4>Page count : {{ book["pgcount"] }}</h4>
     <h4>Publisher : {{ book["publisher"] }}</h4>
     <h4>Average Rating : {{ book["avgrate"] }} <i class="bi bi-star"></i></h4>
-    <form action="/collection">
-        <input type="hidden" value="{{ book['id'] }}" name="id">
+
+    {% if not incollection %}
+    <form action="/collection" method="POST">
+    <input type="hidden" value="{{ book['id'] }}" name="id">
+        <input type="hidden" value="{{ book['title'] }}" name="title">
         <input type="hidden" value="{{ book['thumb'] }}" name="imglink">
-        <input type="hidden" value="{{ book['authors'] }}" name="imglink">
+        {% for author in book["authors"] %}
+            <input type="hidden" value="{{ author }}" name="authors">
+        {% endfor %}
         <input type="submit" class="mb-2 btn btn-primary" value="Add to collection">
     </form>
-        <form action="/wish">
+        <form action="/wish" method="post">
         <input type="hidden" value="{{ book['id'] }}" name="id">
+        <input type="hidden" value="{{ book['title'] }}" name="title">
         <input type="hidden" value="{{ book['thumb'] }}" name="imglink">
-        <input type="hidden" value="{{ book['authors'] }}" name="imglink">
         <input type="submit" class="mb-2 btn btn-primary" value="Add to wishlist">
     </form>
+    {% endif %}
+
 
 {% endblock %}
