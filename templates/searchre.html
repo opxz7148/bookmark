@@ -17,25 +17,26 @@
         </thead>
         
         <tbody>
-            {% for book in book_re %}
-                {% if book != None %}
-                
-                <tr>          
-                        <td><img src="{{ book['smallthumb'] }}" alt=""></td>
-                        <td><h5>{{ book["title"] }}</h5></td>
-                        <td>
-                            {% for author in book["authors"] %}
-                            {{ author }}
-                            <br>
-                            {% endfor %}
-                        </td>
-                        <form method="POST" action="/moreinfo">
-                            <input type="hidden" value="{{ book['id'] }}" name="id">
-                            <td><input type="submit" value="More Info" class="mb-2 btn btn-primary"></td>
-                        </form>
-                </tr>
-                
-                {% endif %}
+            {% for id in book_re %}
+                {% set book = getbookinfo(id, "s") %}
+                    {% if book != None %}
+                    
+                    <tr>          
+                            <td><img src="{{ book['smallthumb'] }}" alt=""></td>
+                            <td><h5>{{ book["title"] }}</h5></td>
+                            <td>
+                                {% for author in book["authors"] %}
+                                {{ author }}
+                                <br>
+                                {% endfor %}
+                            </td>
+                            <form method="POST" action="/moreinfo">
+                                <input type="hidden" value="{{ book['id'] }}" name="id">
+                                <td><input type="submit" value="More Info" class="mb-2 btn btn-primary"></td>
+                            </form>
+                    </tr>
+                    
+                    {% endif %}
             {% endfor %}
         </tbody>
     </table>

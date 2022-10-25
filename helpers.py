@@ -60,14 +60,14 @@ def searchbook(name):
         for book in bookRe["items"]:
             id_list.append(book["id"])
         
-        # Create list to store every book info
-        bookinfo = []
+        # # Create list to store every book info
+        # bookinfo = []
 
-        for id in id_list:
-            eachbookinfo = getbookinfo(id, "s")
-            bookinfo.append(eachbookinfo)
+        # for id in id_list:
+        #     eachbookinfo = getbookinfo(id, "s")
+        #     bookinfo.append(eachbookinfo)
     
-        return bookinfo
+        return id_list
     except (KeyError, TypeError, ValueError):
         return None
 

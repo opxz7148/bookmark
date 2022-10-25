@@ -172,7 +172,7 @@ def search():
         #     app.logger.info("")
 
         # Render template with book result and keyword
-        return render_template("searchre.html", book_re=book_re, keyword=keyword)
+        return render_template("searchre.html", book_re=book_re, keyword=keyword, getbookinfo=getbookinfo)
     else:
         test = db.execute("SELECT * FROM bookusers WHERE id = 10")
         app.logger.info(test)
