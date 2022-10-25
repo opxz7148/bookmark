@@ -180,6 +180,7 @@ def search():
 
 
 @app.route("/moreinfo", methods=["POST"])
+@login_required
 def moreinfo():
 
     # If recieve POST request 
@@ -217,6 +218,7 @@ def moreinfo():
 
 
 @app.route("/profile")
+@login_required
 def profile():
     # Get user username
     username = (db.execute("SELECT username FROM bookusers WHERE id = ?", session["user_id"]))[0]["username"]
@@ -281,6 +283,7 @@ def profile():
 
 
 @app.route("/collection", methods=["POST"])
+@login_required
 def add_to_collection():
     if request.method == "POST":
         # Get each information from form
@@ -316,6 +319,7 @@ def add_to_collection():
 
 
 @app.route("/wish", methods=["POST"])
+@login_required
 def add_to_wish():
     if request.method == "POST":
         # Get each information from form
@@ -351,6 +355,7 @@ def add_to_wish():
 
 
 @app.route("/done", methods=["POST"])
+@login_required
 def move_to_done():
     if request.method == "POST":
         booknoid = request.form.get("noid")
@@ -360,6 +365,7 @@ def move_to_done():
 
 
 @app.route("/gotit", methods=["POST"])
+@login_required
 def move_to_ongoing():
     if request.method == "POST":
         booknoid = request.form.get("noid")
@@ -369,6 +375,7 @@ def move_to_ongoing():
 
 
 @app.route("/remove", methods=["POST"])
+@login_required
 def remove():
     if request.method == "POST":
         booknoid = request.form.get("noid")
@@ -378,7 +385,6 @@ def remove():
 
 
 def get_user_lst(type):
-
     if type != "W" and type != "O" and type != "D":
         return None
     user_lst = db.execute(

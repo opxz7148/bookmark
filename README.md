@@ -1,4 +1,6 @@
 # BookMark
 ### Video Demo:
 ### Description:
-    BookMark is web application that use to manage your book collection. 
+    BookMark is web application that use to manage your book collection. What you can do with this web-app is search up a book. You can read each book detail and  add to your collection to remember which book you already have and current reading or already done reading it. You can also add to wishlist which will remind yourself which book you want to read in the future. All of your collection will be appear on your profile page with your favourites genre. All book that you have add to your collection will be in currently reading list but if you have done that book you can move to done list. If you want to read it again you can move back to curently read to. After you have plenty of book in collection you may want to remove some of it. You can remove your book in collection by find that book in your profile and click remove button on your book side.
+
+    In project directory their plenty of file. First is app.py this main python file that use to run web-app contain action for each URL and request. Next is helpers.py this file contain useful function that use in app.py esspecial function that contact with google book API. Before run this program you must set google API key in helpers.py first. templates contain each page templates and static contain CSS file. Lastly book.db SQL database that contain users and their own book.

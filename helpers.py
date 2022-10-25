@@ -6,8 +6,14 @@ import urllib.parse
 from flask import redirect, render_template, request, session
 from functools import wraps
 
+class ApiError(Exception):
+    pass
+
 # Insert google api here
-api_key = "AIzaSyBgtSB8VJxzH1tpeFoN30zAgy7bm9NCMFM" 
+api_key = "" 
+
+if api_key == "":
+    raise ApiError
 
 def apology(message, code=400):
     """Render message as an apology to user."""
