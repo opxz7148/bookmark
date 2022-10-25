@@ -29,7 +29,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///finance.db")
+db = SQL("sqlite:///book.db")
 
 @app.after_request
 def after_request(response):
@@ -178,6 +178,7 @@ def search():
         app.logger.info(test)
         return render_template("searchbook.html")
 
+
 @app.route("/moreinfo", methods=["POST"])
 def moreinfo():
 
@@ -214,11 +215,12 @@ def moreinfo():
         # Render more info page with book information
         return render_template("moreinfo.html", book=book, incollection=incollection)
 
+
 @app.route("/profile")
 def profile():
     # Get user username
     username = (db.execute("SELECT username FROM bookusers WHERE id = ?", session["user_id"]))[0]["username"]
-
+    
     # Get user fav genre
     usergenre = db.execute(
     """
@@ -232,17 +234,51 @@ def profile():
     )
     """
     , session["user_id"])
+    if usergenre == []:
+        user_genre_c = False
+    else:
+        user_genre_c = True
+
 
     # Get user book ongoinng collection
     user_current = get_user_lst("O")
+    if user_current == []:
+        user_current_c = False
+    else:
+        user_current_c = True
 
     # Get user wishlist
     user_wish = get_user_lst("W")
-    
+    if user_wish == []:
+        user_wish_c = False
+    else:
+        user_wish_c = True
+
+    # Get user done list
+    user_done = get_user_lst("D")
+    if user_done == []:
+        user_done_c = False
+    else:
+        user_done_c = True
+
+
     for book in user_current:
         book["authors"] = book["authors"].split(",")
 
-    return render_template("profile.html", username=username, usergenre=usergenre, user_current=user_current, user_wish=user_wish)
+    app.logger.info(user_genre_c)
+    return render_template(
+    "profile.html", 
+    username=username, 
+    usergenre=usergenre, 
+    user_genre_c=user_genre_c,
+    user_current=user_current,
+    user_current_c=user_current_c, 
+    user_wish=user_wish, 
+    user_wish_c=user_wish_c,
+    user_done=user_done, 
+    user_done_c=user_done_c
+    )
+
 
 @app.route("/collection", methods=["POST"])
 def add_to_collection():
@@ -312,6 +348,34 @@ def add_to_wish():
     
         db.execute("INSERT INTO users_book (userid, bookid, status) VALUES(?,?,?)", userid, booknoid, "W")
     return redirect("/profile")
+
+
+@app.route("/done", methods=["POST"])
+def move_to_done():
+    if request.method == "POST":
+        booknoid = request.form.get("noid")
+        app.logger.info(booknoid)
+        db.execute('UPDATE users_book SET status = "D" WHERE userid = ? AND bookid = ?', session["user_id"], booknoid)
+    return redirect("/profile")
+
+
+@app.route("/gotit", methods=["POST"])
+def move_to_ongoing():
+    if request.method == "POST":
+        booknoid = request.form.get("noid")
+        app.logger.info(booknoid)
+        db.execute('UPDATE users_book SET status = "O" WHERE userid = ? AND bookid = ?', session["user_id"], booknoid)
+    return redirect("/profile")
+
+
+@app.route("/remove", methods=["POST"])
+def remove():
+    if request.method == "POST":
+        booknoid = request.form.get("noid")
+        app.logger.info(booknoid)
+        db.execute('DELETE FROM users_book WHERE userid = ? AND bookid = ?', session["user_id"], booknoid)
+    return redirect("/profile")
+
 
 def get_user_lst(type):
 

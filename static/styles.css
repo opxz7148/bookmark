@@ -27,3 +27,18 @@ nav .navbar-brand .green
     padding-left: 20%;
     padding-right: 20%;
 }
+
+.cover
+{
+    width: 33% !important;
+}
+
+.title
+{
+    width: 33% !important;
+}
+
+.author
+{
+    width: 33% !important;
+}

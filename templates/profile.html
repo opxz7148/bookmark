@@ -7,21 +7,26 @@
 {% block main %}
     <div class="p-5">
         <h1>{{ username }}!</h1>
+        {% if user_genre_c %}
         <h2>Favourite Genre:</h2>
         <h5>
             {% for genre in usergenre %}
                 {{ genre["genre"] ~ ","}}
             {% endfor %}
-        </h5>
-       
+        </h5>       
+        {% endif %}
     </div>
-        <h4>Curently reading</h4>
-        <table class="table align-middle">
+    {% if not user_current_c and not user_wish_c and not user_done_c %}
+    <h3>You doesn't have any book in collection. Let find some in search tab above!</h3>
+    {% endif %}
+    {% if user_current_c %}
+        <table class="table align-middle caption-top">
+            <caption><h1>Curently reading</h1></caption>
             <thead>
                 <tr>
-                    <th>Cover</th>
-                    <th>Title</th>
-                    <th>Author</th>
+                    <th class="cover">Cover</th>
+                    <th class="title">Title</th>
+                    <th class="author">Author</th>
                 </tr>
             </thead>
             <tbody>
@@ -44,31 +49,32 @@
                             <input type="hidden" value="{{ book['bookgid'] }}" name="id">
                             <td><input type="submit" value="More Info" class="btn btn-primary"></td>
                         </form>
+
+                        <form method="POST" action="/remove">
+                            <input type="hidden" value="{{ book['bookgid'] }}" name="id">
+                            <input type="hidden" value="{{ book['booknoid'] }}" name="noid">
+                            <td><input type="submit" value="Remove from collection" class="btn btn-primary"></td>
+                        </form>
               
                         <form method="POST" action="/done">
                             <input type="hidden" value="{{ book['bookgid'] }}" name="id">
-                            <input type="hidden" value="{{ book['bookgnoid'] }}" name="noid">
+                            <input type="hidden" value="{{ book['booknoid'] }}" name="noid">
                             <td><input type="submit" value="Done reading" class="btn btn-primary"></td>
-                        </form>
-                    
-                        <form method="POST" action="/remove">
-                            <input type="hidden" value="{{ book['bookgid'] }}" name="id">
-                            <input type="hidden" value="{{ book['bookgnoid'] }}" name="noid">
-                            <td><input type="submit" value="Remove from collection" class="btn btn-primary"></td>
                         </form>
                     </div>
                     {% endif %}
                 {% endfor %}
             </tbody>
-
+    {% endif %}
+    {% if user_wish_c %}
         </table>
-        <h4 class="mt-5">Wishlist</h4>
-        <table class="table align-middle">
+        <table class="table align-middle caption-top">
+            <caption><h1>Wishlist</h1></caption>
             <thead>
                 <tr>
-                    <th>Cover</th>
-                    <th>Title</th>
-                    <th>Author</th>
+                    <th class="cover">Cover</th>
+                    <th class="title">Title</th>
+                    <th class="author">Author</th>
                 </tr>
             </thead>
             <tbody>
@@ -88,21 +94,65 @@
                             <input type="hidden" value="{{ book['bookgid'] }}" name="id">
                             <td><input type="submit" value="More Info" class="btn btn-primary"></td>
                         </form>
-              
-                        <form method="POST" action="/done">
-                            <input type="hidden" value="{{ book['bookgid'] }}" name="id">
-                            <input type="hidden" value="{{ book['bookgnoid'] }}" name="noid">
-                            <td><input type="submit" value="Done reading" class="btn btn-primary"></td>
-                        </form>
-                    
+
                         <form method="POST" action="/remove">
                             <input type="hidden" value="{{ book['bookgid'] }}" name="id">
-                            <input type="hidden" value="{{ book['bookgnoid'] }}" name="noid">
+                            <input type="hidden" value="{{ book['booknoid'] }}" name="noid">
                             <td><input type="submit" value="Remove from collection" class="btn btn-primary"></td>
+                        </form>
+              
+                        <form method="POST" action="/gotit">
+                            <input type="hidden" value="{{ book['bookgid'] }}" name="id">
+                            <input type="hidden" value="{{ book['booknoid'] }}" name="noid">
+                            <td><input type="submit" value="Already got it!" class="btn btn-primary"></td>
                         </form>
                     </div>
                     {% endif %}
                 {% endfor %}
             </tbody>
         </table>
+    {% endif %}
+    {% if user_done_c %}
+        <table class="table align-middle caption-top">
+            <caption><h1>Done reading</h1></caption>
+            <thead>
+                <tr>
+                    <th class="cover">Cover</th>
+                    <th class="title">Title</th>
+                    <th class="author">Author</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in user_done %}
+                    {% if book != None %}
+                    
+                    <tr>          
+                            <td><img src="{{ book['imglink'] }}" alt=""></td>
+                            <td><h5>{{ book["title"] }}</h5></td>
+                            <td>
+                                {{ book["authors"] }}
+                            </td>
+                            
+                    </tr>
+                    <div class="d-flex flex-row justify-content-center">
+                        <form method="POST" action="/moreinfo">
+                            <input type="hidden" value="{{ book['bookgid'] }}" name="id">
+                            <td><input type="submit" value="More Info" class="btn btn-primary"></td>
+                        </form>
+                        <form method="POST" action="/remove">
+                            <input type="hidden" value="{{ book['bookgid'] }}" name="id">
+                            <input type="hidden" value="{{ book['booknoid'] }}" name="noid">
+                            <td><input type="submit" value="Remove from collection" class="btn btn-primary"></td>
+                        </form>
+                        <form method="POST" action="/reread">
+                            <input type="hidden" value="{{ book['bookgid'] }}" name="id">
+                            <input type="hidden" value="{{ book['booknoid'] }}" name="noid">
+                            <td><input type="submit" value="Read it again!" class="btn btn-primary"></td>
+                        </form>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
 {% endblock %}
